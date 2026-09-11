@@ -1,4 +1,4 @@
-# HANDOVER.md — 会话交接文档
+# CONTINUE.md — 会话交接文档
 
 > 最后更新：YYYY-MM-DD HH:MM
 

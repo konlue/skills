@@ -8,7 +8,7 @@
 
 AI 编程会话有上下文上限。会话断了之后，新对话什么都不记得——你得重新解释项目背景、已经做了什么、踩过哪些坑。
 
-这个 Skill 让 AI 在会话结束前自动写一份交接文档 `HANDOVER.md`，下次开新会话只要说"先读 HANDOVER.md"，它就能无缝接上。
+这个 Skill 让 AI 在会话结束前自动写一份交接文档 `CONTINUE.md`，下次开新会话只要说"先读 CONTINUE.md"，它就能无缝接上。
 
 ## 安装
 
@@ -41,7 +41,7 @@ cp SKILL.md codex-instructions/session-handoff.md
 输入：
 
 ```
-请写一份交接文档存到 HANDOVER.md
+请写一份交接文档存到 CONTINUE.md
 ```
 
 AI 会根据当前对话内容，生成一份包含以下内容的交接文档：
@@ -60,7 +60,7 @@ AI 会根据当前对话内容，生成一份包含以下内容的交接文档�
 第一句话：
 
 ```
-先读 HANDOVER.md
+先读 CONTINUE.md
 ```
 
 AI 读完交接文档后，会直接继续工作，不需要你重新解释任何东西。
@@ -82,10 +82,10 @@ AI 读完交接文档后，会直接继续工作，不需要你重新解释任�
 
 ## 示例
 
-一个真实的 `HANDOVER.md` 长这样：
+一个真实的 `CONTINUE.md` 长这样：
 
 ```markdown
-# HANDOVER.md — 会话交接文档
+# CONTINUE.md — 会话交接文档
 
 > 最后更新：2025-07-28 14:30
 
