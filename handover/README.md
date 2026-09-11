@@ -1,38 +1,68 @@
-# 🔄 Handover Skill
+# 🔄 Handover
 
 **长会话结束前写交接文档，新会话读完直接干活。**
 
-适用于 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 和 [OpenAI Codex](https://github.com/openai/codex)。
+适用于 Codex、Claude Code、DSH、WorkBuddy、Zcode、Trae、Qoder。
 
 ## 解决什么问题
 
 AI 编程会话有上下文上限。会话断了之后，新对话什么都不记得——你得重新解释项目背景、已经做了什么、踩过哪些坑。
 
-这个 Skill 让 AI 在会话结束前自动写一份交接文档 `CONTINUE.md`，下次开新会话只要说"先读 CONTINUE.md"，它就能无缝接上。
+这个 Skill 让 AI 在会话结束前把进度写进 `CONTINUE.md`，下次开新会话只要说「先读 CONTINUE.md」，它就能无缝接上。
 
 ## 安装
 
-### Claude Code
+选你用的平台，一行搞定。所有平台共用同一份 `SKILL.md`，内容完全一致。
 
-把 `SKILL.md` 放到项目根目录的 `.claude/` 下：
+| 平台 | 装到哪 | 生效范围 |
+|------|--------|----------|
+| **Codex** | `AGENTS.md`（追加） | 当前项目 |
+| **Claude Code** | `CLAUDE.md`（追加）+ `.claude/commands/handover.md` | 当前项目 + `/handover` 命令 |
+| **DSH** | `~/.dsh/skills/handover/SKILL.md` | 全局（项目级用 `.dsh/skills/`） |
+| **WorkBuddy** | `~/.workbuddy/skills/handover/SKILL.md` | 全局（项目级用 `.workbuddy/skills/`） |
+| **Zcode** | `~/.zcode/skills/handover/SKILL.md` | 全局 |
+| **Trae** | `.trae/rules/handover.md` | 当前项目（需在设置里开启规则读取） |
+| **Qoder** | `~/.qoder/skills/handover/SKILL.md` | 全局（项目级用 `.qoder/skills/`） |
+
+### 方式一：一键脚本
 
 ```bash
-mkdir -p .claude
-cp SKILL.md .claude/session-handoff.md
+./install.sh                 # 项目级：追加到 AGENTS.md + 生成 Trae 规则
+./install.sh --project       # 同上
+./install.sh --cc            # Claude Code：CLAUDE.md + .claude/commands/handover.md
+./install.sh --codex         # Codex：追加到 ~/.codex/AGENTS.md
+./install.sh --dsh           # DSH：装到 ~/.dsh/skills/
+./install.sh --workbuddy     # WorkBuddy：装到 ~/.workbuddy/skills/
+./install.sh --zcode         # Zcode：装到 ~/.zcode/skills/
+./install.sh --trae          # Trae：装到 .trae/rules/
+./install.sh --qoder         # Qoder：装到 ~/.qoder/skills/
+./install.sh --all           # 全平台，一次装完
+./install.sh --uninstall     # 撤掉装过的所有内容
 ```
 
-或者直接把 `SKILL.md` 的内容追加到你已有的 `.claude/CLAUDE.md` 里。
+脚本用 `<!-- handover:start/end -->` 标记包裹追加内容，重复运行不会产生重复副本，`--uninstall` 能干净移除。
 
-### Codex
-
-把 `SKILL.md` 放到项目根目录的 `codex-instructions/` 下：
+### 方式二：手动复制
 
 ```bash
-mkdir -p codex-instructions
-cp SKILL.md codex-instructions/session-handoff.md
+# 通用（Codex / DSH / Zcode / Qoder 走 AGENTS.md 的平台）
+cat handover/SKILL.md >> AGENTS.md
+
+# Claude Code
+cat handover/SKILL.md >> CLAUDE.md
+mkdir -p .claude/commands && cp handover/SKILL.md .claude/commands/handover.md
+
+# 走 skills 目录的平台
+mkdir -p ~/.workbuddy/skills/handover && cp handover/SKILL.md ~/.workbuddy/skills/handover/
+mkdir -p ~/.dsh/skills/handover       && cp handover/SKILL.md ~/.dsh/skills/handover/
+mkdir -p ~/.zcode/skills/handover     && cp handover/SKILL.md ~/.zcode/skills/handover/
+mkdir -p ~/.qoder/skills/handover     && cp handover/SKILL.md ~/.qoder/skills/handover/
+
+# Trae
+mkdir -p .trae/rules && cp handover/SKILL.md .trae/rules/handover.md
 ```
 
-或者把内容追加到你的 `codex-instructions/AGENTS.md`。
+Trae 用户注意：项目规则默认读取 `AGENTS.md` / `CLAUDE.md` 的开关需要在 `设置 → 规则 → 导入设置` 里打开；用 `.trae/rules/` 目录则无需开关。
 
 ## 使用
 
@@ -40,18 +70,18 @@ cp SKILL.md codex-instructions/session-handoff.md
 
 输入：
 
-```
+```text
 请写一份交接文档存到 CONTINUE.md
 ```
 
-AI 会根据当前对话内容，生成一份包含以下内容的交接文档：
+AI 会根据当前对话，在项目根目录生成 `CONTINUE.md`：
 
 | 模块 | 内容 |
 |------|------|
 | **当前任务** | 我们在做什么，目标是什么 |
-| **已完成** | 做了哪些东西，哪些只做了一半 |
+| **已完成** | 做了哪些，哪些只做了一半 |
 | **当前状态** | 卡在哪，有什么未解决的问题 |
-| **下一步计划** | 接下来该做什么，优先级 |
+| **下一步计划** | 接下来做什么，优先级 |
 | **踩坑记录** | 试过但不行的方案，避免重复踩坑 |
 | **关键上下文** | 新会话需要知道的背景信息 |
 
@@ -59,26 +89,35 @@ AI 会根据当前对话内容，生成一份包含以下内容的交接文档�
 
 第一句话：
 
-```
+```text
 先读 CONTINUE.md
 ```
 
-AI 读完交接文档后，会直接继续工作，不需要你重新解释任何东西。
+读完直接继续工作，不需要重新解释任何东西。
 
 ## 什么时候写
 
-不用等会话"正式结束"。任何你觉得有进展的时刻都可以写一次，覆盖更新就行：
+不用等会话「正式结束」。任何有进展的时刻都可以写一次，覆盖更新就行：
 
 - 实现了一个重要功能后
 - 踩了一个大坑、搞清楚原因后
 - 准备切换到另一个任务前
 - 上下文快满了、准备开新会话前
 
+装好之后，AI 在这些时机会主动提醒你写——但不会不问自取地直接动笔。
+
+## 手动触发
+
+- **Claude Code / Qoder**：输入 `/handover`
+- **Trae**：聊天框输入 `#Rule handover`
+- **其他平台**：直接说「写份交接文档」
+
 ## Tips
 
 - **踩坑记录最有价值** — 写详细点，包括报错信息、尝试过的方案、为什么不行
-- **下一步要具体** — "先修 `src/api.ts` 里的鉴权逻辑，然后跑测试" 比 "继续开发" 好 100 倍
-- **`CONTINUE.md` 跟着项目走** — 放在项目根目录，提交到 Git，这样换机器也能用
+- **下一步要具体** —「先修 `src/api/user.ts` 的空值判断，再跑 `npm test`」比「继续开发」好 100 倍
+- **`CONTINUE.md` 跟着项目走** — 放在项目根目录，提交到 Git，换机器也能用
+- **任务收尾就删掉** — 别让它变成过期的僵尸文档
 
 ## 示例
 
@@ -132,6 +171,8 @@ AI 读完交接文档后，会直接继续工作，不需要你重新解释任�
 - 测试跑 `npm test`，用的是 vitest
 - 代码风格：2 空格缩进，单引号，不加分号
 ```
+
+空白模板见 [CONTINUE.template.md](CONTINUE.template.md)。
 
 ## License
 
