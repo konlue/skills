@@ -32,8 +32,9 @@ Minipatch 把这个「最小改动原则」固化成规则，让 AI 在动任何
 ### 方式一：一键脚本
 
 ```bash
-./install.sh                 # 项目级：写 AGENTS.md + Trae 规则 + Claude 命令
-./install.sh --cc            # 额外装 Claude Code 的 /minipatch 命令
+./install.sh                 # 项目级：追加到 AGENTS.md + 生成 Trae 规则
+./install.sh --project       # 同上
+./install.sh --cc            # Claude Code：CLAUDE.md + .claude/commands/minipatch.md
 ./install.sh --codex         # Codex：追加到 ~/.codex/AGENTS.md
 ./install.sh --dsh           # DSH：装到 ~/.dsh/skills/
 ./install.sh --workbuddy     # WorkBuddy：装到 ~/.workbuddy/skills/
