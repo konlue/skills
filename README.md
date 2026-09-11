@@ -16,18 +16,19 @@
 
 | Skill | 一句话定位 | 适用平台 |
 |-------|-----------|----------|
-| [🔄 handover](handover/) | 长会话结束前写一份交接文档，新会话读文档就能接着干 | Claude Code、Codex |
+| [🔄 handover](handover/) | 长会话结束前写一份交接文档，新会话读文档就能接着干 | 全平台（Codex / Claude Code / DSH / WorkBuddy / Zcode / Trae / Qoder） |
 | [🩹 minipatch](minipatch/) | 最小改动原则：先报变更计划再动手，只改该改的文件，不重构、不升级依赖 | 全平台（Codex / Claude Code / DSH / WorkBuddy / Zcode / Trae / Qoder） |
 
 ## 30 秒上手
 
 ### 🔄 handover
 
-装：把 `handover/SKILL.md` 复制到你的项目里。
+装：用它自带的一键脚本，或手动复制到对应平台目录。
 
 ```bash
-mkdir -p .claude && cp handover/SKILL.md .claude/session-handoff.md   # Claude Code
-mkdir -p codex-instructions && cp handover/SKILL.md codex-instructions/session-handoff.md  # Codex
+cd handover && ./install.sh --all      # 全平台
+cd handover && ./install.sh --cc       # 只装 Claude Code
+cd handover && ./install.sh --trae     # 只装 Trae
 ```
 
 用：
