@@ -23,7 +23,7 @@
 
 ### 🔄 handover
 
-装：用它自带的一键脚本，或手动复制到对应平台目录。
+安装：用它自带的一键脚本，或手动复制到对应平台目录。
 
 ```bash
 cd handover && ./install.sh --all      # 全平台
@@ -31,7 +31,7 @@ cd handover && ./install.sh --cc       # 只装 Claude Code
 cd handover && ./install.sh --trae     # 只装 Trae
 ```
 
-用：
+使用：
 
 ```text
 会话结束前说 → 请写一份交接文档存到 CONTINUE.md
@@ -40,7 +40,7 @@ cd handover && ./install.sh --trae     # 只装 Trae
 
 ### 🩹 minipatch
 
-装：用它自带的一键脚本，或手动复制到对应平台目录。
+安装：用它自带的一键脚本，或手动复制到对应平台目录。
 
 ```bash
 cd minipatch && ./install.sh --all      # 全平台
@@ -48,7 +48,7 @@ cd minipatch && ./install.sh --cc       # 只装 Claude Code
 cd minipatch && ./install.sh --trae     # 只装 Trae
 ```
 
-用：改代码前加一句，AI 会先给变更计划等你确认。
+使用：改代码前加一句，AI 会先给变更计划等你确认。
 
 ```text
 /minipatch 修一下 src/api/user.ts 里 id 为空时的崩溃
