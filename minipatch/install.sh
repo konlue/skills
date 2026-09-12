@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Minipatch installer — 把最小改动原则装到各个 AI 编程工具里
-# 用法: ./install.sh [--all|--project|--codex|--cc|--dsh|--workbuddy|--zcode|--trae|--qoder|--uninstall]
+# 用法: ./install.sh [--all|--project|--codex|--cc|--cursor|--opencode|--pi|--dsh|--workbuddy|--zcode|--trae|--qoder|--uninstall]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,6 +22,9 @@ Minipatch — 最小改动原则（防乱改）
   ./install.sh --project       同上
   ./install.sh --codex         Codex:  追加到 ~/.codex/AGENTS.md
   ./install.sh --cc            Claude Code: CLAUDE.md + .claude/commands/minipatch.md
+  ./install.sh --cursor        Cursor:  .cursor/rules/minipatch.mdc
+  ./install.sh --opencode      OpenCode: 追加到 ~/.config/opencode/AGENTS.md
+  ./install.sh --pi            Pi:      追加到 ~/.pi/agent/AGENTS.md
   ./install.sh --dsh           DSH:    ~/.dsh/skills/minipatch/SKILL.md
   ./install.sh --workbuddy     WorkBuddy: ~/.workbuddy/skills/minipatch/SKILL.md
   ./install.sh --zcode         Zcode:  ~/.zcode/skills/minipatch/SKILL.md
@@ -101,6 +104,31 @@ do_cc() {
   echo "  ✔ 安装到 .claude/commands/minipatch.md（对话里输入 /minipatch 触发）"
 }
 
+do_cursor() {
+  echo "[Cursor] 项目规则"
+  local file="$PWD/.cursor/rules/minipatch.mdc"
+  mkdir -p "$(dirname "$file")"
+  {
+    echo "---"
+    echo "description: 最小改动原则——改代码前先报变更计划，只改授权文件，不重构、不升级依赖"
+    echo "alwaysApply: true"
+    echo "---"
+    echo
+    body
+  } > "$file"
+  echo "  ✔ 安装到 $file（对话里 @minipatch 可手动引用）"
+}
+
+do_opencode() {
+  echo "[OpenCode] 全局指令"
+  append_block "${OPENCODE_CONFIG_HOME:-$HOME/.config/opencode}/AGENTS.md"
+}
+
+do_pi() {
+  echo "[Pi] 全局指令"
+  append_block "$HOME/.pi/agent/AGENTS.md"
+}
+
 do_dsh() {
   echo "[DSH] 全局 skill"
   install_skill_dir "${DSH_HOME:-$HOME/.dsh}/skills/minipatch"
@@ -136,17 +164,31 @@ do_qoder() {
   install_skill_dir "$HOME/.qoder/skills/minipatch"
 }
 
+# 只剩空行说明这个文件是我们安装时新建的，连文件一起删掉，不留空壳
+prune_if_empty() {
+  local file="$1"
+  [ -f "$file" ] || return 0
+  grep -qE '[^[:space:]]' "$file" && return 0
+  rm -f "$file"
+  rmdir "$(dirname "$file")" 2>/dev/null || true
+  echo "  ✔ 删除空文件 $file"
+}
+
 do_uninstall() {
   echo "移除 minipatch..."
   for f in "$PWD/AGENTS.md" "$PWD/CLAUDE.md" \
            "${CODEX_HOME:-$HOME/.codex}/AGENTS.md" \
-           "${DSH_HOME:-$HOME/.dsh}/AGENTS.md"; do
+           "${DSH_HOME:-$HOME/.dsh}/AGENTS.md" \
+           "${OPENCODE_CONFIG_HOME:-$HOME/.config/opencode}/AGENTS.md" \
+           "$HOME/.pi/agent/AGENTS.md"; do
     if [ -f "$f" ] && grep -qF "$MARK_START" "$f"; then
       strip_block "$f"
       echo "  ✔ 清理 $f"
+      prune_if_empty "$f"
     fi
   done
-  for p in "$PWD/.trae/rules/minipatch.md" "$PWD/.claude/commands/minipatch.md" \
+  for p in "$PWD/.trae/rules/minipatch.md" "$PWD/.cursor/rules/minipatch.mdc" \
+           "$PWD/.claude/commands/minipatch.md" \
            "${DSH_HOME:-$HOME/.dsh}/skills/minipatch" \
            "$HOME/.workbuddy/skills/minipatch" \
            "$HOME/.zcode/skills/minipatch" \
@@ -159,20 +201,31 @@ do_uninstall() {
   echo "完成。"
 }
 
-case "${1:-}" in
-  -h|--help)    usage ;;
-  --uninstall)  do_uninstall ;;
-  --all)        do_project; do_codex; do_cc; do_dsh; do_workbuddy; do_zcode; do_qoder ;;
-  --project)    do_project ;;
-  --codex)      do_codex ;;
-  --cc)         do_cc ;;
-  --dsh)        do_dsh ;;
-  --workbuddy)  do_workbuddy ;;
-  --zcode)      do_zcode ;;
-  --trae)       do_trae ;;
-  --qoder)      do_qoder ;;
-  "")           do_project ;;
-  *)            echo "未知参数: $1"; usage; exit 1 ;;
-esac
+# 支持多个参数：./install.sh --cc --cursor --trae
+if [ "$#" -eq 0 ]; then
+  set -- --project
+fi
 
-[ "${1:-}" = "--uninstall" ] || echo "装好了。新开一个会话即可生效。"
+ran_uninstall=0
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)    usage; exit 0 ;;
+    --uninstall)  do_uninstall; ran_uninstall=1 ;;
+    --all)        do_project; do_codex; do_cc; do_cursor; do_opencode; do_pi; do_dsh; do_workbuddy; do_zcode; do_qoder ;;
+    --project)    do_project ;;
+    --codex)      do_codex ;;
+    --cc)         do_cc ;;
+    --cursor)     do_cursor ;;
+    --opencode)   do_opencode ;;
+    --pi)         do_pi ;;
+    --dsh)        do_dsh ;;
+    --workbuddy)  do_workbuddy ;;
+    --zcode)      do_zcode ;;
+    --trae)       do_trae ;;
+    --qoder)      do_qoder ;;
+    "")           do_project ;;
+    *)            echo "未知参数: $arg"; usage; exit 1 ;;
+  esac
+done
+
+[ "$ran_uninstall" -eq 1 ] || echo "装好了。新开一个会话即可生效。"
