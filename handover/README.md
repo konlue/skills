@@ -2,7 +2,7 @@
 
 **长会话结束前写交接文档，新会话读完直接干活。**
 
-适用于 Codex、Claude Code、DSH、WorkBuddy、Zcode、Trae、Qoder。
+适用于 Codex、Claude Code、Cursor、OpenCode、Pi、DSH、WorkBuddy、Zcode、Trae、Qoder。
 
 ## 解决什么问题
 
@@ -18,6 +18,9 @@ AI 编程会话有上下文上限。会话断了之后，新对话什么都不�
 |------|--------|----------|
 | **Codex** | `AGENTS.md`（追加） | 当前项目 |
 | **Claude Code** | `CLAUDE.md`（追加）+ `.claude/commands/handover.md` | 当前项目 + `/handover` 命令 |
+| **Cursor** | `.cursor/rules/handover.mdc` | 当前项目（`@handover` 可手动引用） |
+| **OpenCode** | `~/.config/opencode/AGENTS.md`（追加） | 全局 |
+| **Pi** | `~/.pi/agent/AGENTS.md`（追加） | 全局 |
 | **DSH** | `~/.dsh/skills/handover/SKILL.md` | 全局（项目级用 `.dsh/skills/`） |
 | **WorkBuddy** | `~/.workbuddy/skills/handover/SKILL.md` | 全局（项目级用 `.workbuddy/skills/`） |
 | **Zcode** | `~/.zcode/skills/handover/SKILL.md` | 全局 |
@@ -30,6 +33,9 @@ AI 编程会话有上下文上限。会话断了之后，新对话什么都不�
 ./install.sh                 # 项目级：追加到 AGENTS.md + 生成 Trae 规则
 ./install.sh --project       # 同上
 ./install.sh --cc            # Claude Code：CLAUDE.md + .claude/commands/handover.md
+./install.sh --cursor        # Cursor：.cursor/rules/handover.mdc
+./install.sh --opencode      # OpenCode：~/.config/opencode/AGENTS.md
+./install.sh --pi            # Pi：~/.pi/agent/AGENTS.md
 ./install.sh --codex         # Codex：追加到 ~/.codex/AGENTS.md
 ./install.sh --dsh           # DSH：装到 ~/.dsh/skills/
 ./install.sh --workbuddy     # WorkBuddy：装到 ~/.workbuddy/skills/
@@ -51,6 +57,13 @@ cat handover/SKILL.md >> AGENTS.md
 # Claude Code
 cat handover/SKILL.md >> CLAUDE.md
 mkdir -p .claude/commands && cp handover/SKILL.md .claude/commands/handover.md
+
+# Cursor（必须用 .mdc 扩展名，.md 会被忽略）
+mkdir -p .cursor/rules && cp handover/SKILL.md .cursor/rules/handover.mdc
+
+# OpenCode / Pi
+cat handover/SKILL.md >> ~/.config/opencode/AGENTS.md
+cat handover/SKILL.md >> ~/.pi/agent/AGENTS.md
 
 # 走 skills 目录的平台
 mkdir -p ~/.workbuddy/skills/handover && cp handover/SKILL.md ~/.workbuddy/skills/handover/
@@ -110,6 +123,7 @@ AI 会根据当前对话，在项目根目录生成 `CONTINUE.md`：
 
 - **Claude Code / Qoder**：输入 `/handover`
 - **Trae**：聊天框输入 `#Rule handover`
+- **Cursor**：聊天框输入 `@handover`
 - **其他平台**：直接说「写份交接文档」
 
 ## Tips
