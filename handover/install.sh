@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Handover installer — 把会话交接 skill 装到各个 AI 编程工具里
-# 用法: ./install.sh [--all|--project|--codex|--cc|--dsh|--workbuddy|--zcode|--trae|--qoder|--uninstall]
+# 用法: ./install.sh [--all|--project|--codex|--cc|--cursor|--opencode|--pi|--dsh|--workbuddy|--zcode|--trae|--qoder|--uninstall]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -22,6 +22,9 @@ Handover — 会话交接（长会话结束前写 CONTINUE.md）
   ./install.sh --project       同上
   ./install.sh --codex         Codex:  追加到 ~/.codex/AGENTS.md
   ./install.sh --cc            Claude Code: CLAUDE.md + .claude/commands/handover.md
+  ./install.sh --cursor        Cursor:  .cursor/rules/handover.mdc
+  ./install.sh --opencode      OpenCode: 追加到 ~/.config/opencode/AGENTS.md
+  ./install.sh --pi            Pi:      追加到 ~/.pi/agent/AGENTS.md
   ./install.sh --dsh           DSH:    ~/.dsh/skills/handover/SKILL.md
   ./install.sh --workbuddy     WorkBuddy: ~/.workbuddy/skills/handover/SKILL.md
   ./install.sh --zcode         Zcode:  ~/.zcode/skills/handover/SKILL.md
@@ -101,6 +104,31 @@ do_cc() {
   echo "  ✔ 安装到 .claude/commands/handover.md（对话里输入 /handover 触发）"
 }
 
+do_cursor() {
+  echo "[Cursor] 项目规则"
+  local file="$PWD/.cursor/rules/handover.mdc"
+  mkdir -p "$(dirname "$file")"
+  {
+    echo "---"
+    echo "description: 会话交接——长会话结束前把进度与踩坑记录写进 CONTINUE.md，新会话读它接着干"
+    echo "alwaysApply: true"
+    echo "---"
+    echo
+    body
+  } > "$file"
+  echo "  ✔ 安装到 $file（对话里 @handover 可手动引用）"
+}
+
+do_opencode() {
+  echo "[OpenCode] 全局指令"
+  append_block "${OPENCODE_CONFIG_HOME:-$HOME/.config/opencode}/AGENTS.md"
+}
+
+do_pi() {
+  echo "[Pi] 全局指令"
+  append_block "$HOME/.pi/agent/AGENTS.md"
+}
+
 do_dsh() {
   echo "[DSH] 全局 skill"
   install_skill_dir "${DSH_HOME:-$HOME/.dsh}/skills/handover"
@@ -136,17 +164,31 @@ do_qoder() {
   install_skill_dir "$HOME/.qoder/skills/handover"
 }
 
+# 只剩空行说明这个文件是我们安装时新建的，连文件一起删掉，不留空壳
+prune_if_empty() {
+  local file="$1"
+  [ -f "$file" ] || return 0
+  grep -qE '[^[:space:]]' "$file" && return 0
+  rm -f "$file"
+  rmdir "$(dirname "$file")" 2>/dev/null || true
+  echo "  ✔ 删除空文件 $file"
+}
+
 do_uninstall() {
   echo "移除 handover..."
   for f in "$PWD/AGENTS.md" "$PWD/CLAUDE.md" \
            "${CODEX_HOME:-$HOME/.codex}/AGENTS.md" \
-           "${DSH_HOME:-$HOME/.dsh}/AGENTS.md"; do
+           "${DSH_HOME:-$HOME/.dsh}/AGENTS.md" \
+           "${OPENCODE_CONFIG_HOME:-$HOME/.config/opencode}/AGENTS.md" \
+           "$HOME/.pi/agent/AGENTS.md"; do
     if [ -f "$f" ] && grep -qF "$MARK_START" "$f"; then
       strip_block "$f"
       echo "  ✔ 清理 $f"
+      prune_if_empty "$f"
     fi
   done
-  for p in "$PWD/.trae/rules/handover.md" "$PWD/.claude/commands/handover.md" \
+  for p in "$PWD/.trae/rules/handover.md" "$PWD/.cursor/rules/handover.mdc" \
+           "$PWD/.claude/commands/handover.md" \
            "${DSH_HOME:-$HOME/.dsh}/skills/handover" \
            "$HOME/.workbuddy/skills/handover" \
            "$HOME/.zcode/skills/handover" \
@@ -159,20 +201,31 @@ do_uninstall() {
   echo "完成。"
 }
 
-case "${1:-}" in
-  -h|--help)    usage ;;
-  --uninstall)  do_uninstall ;;
-  --all)        do_project; do_codex; do_cc; do_dsh; do_workbuddy; do_zcode; do_qoder ;;
-  --project)    do_project ;;
-  --codex)      do_codex ;;
-  --cc)         do_cc ;;
-  --dsh)        do_dsh ;;
-  --workbuddy)  do_workbuddy ;;
-  --zcode)      do_zcode ;;
-  --trae)       do_trae ;;
-  --qoder)      do_qoder ;;
-  "")           do_project ;;
-  *)            echo "未知参数: $1"; usage; exit 1 ;;
-esac
+# 支持多个参数：./install.sh --cc --cursor --trae
+if [ "$#" -eq 0 ]; then
+  set -- --project
+fi
 
-[ "${1:-}" = "--uninstall" ] || echo "装好了。新开一个会话即可生效。"
+ran_uninstall=0
+for arg in "$@"; do
+  case "$arg" in
+    -h|--help)    usage; exit 0 ;;
+    --uninstall)  do_uninstall; ran_uninstall=1 ;;
+    --all)        do_project; do_codex; do_cc; do_cursor; do_opencode; do_pi; do_dsh; do_workbuddy; do_zcode; do_qoder ;;
+    --project)    do_project ;;
+    --codex)      do_codex ;;
+    --cc)         do_cc ;;
+    --cursor)     do_cursor ;;
+    --opencode)   do_opencode ;;
+    --pi)         do_pi ;;
+    --dsh)        do_dsh ;;
+    --workbuddy)  do_workbuddy ;;
+    --zcode)      do_zcode ;;
+    --trae)       do_trae ;;
+    --qoder)      do_qoder ;;
+    "")           do_project ;;
+    *)            echo "未知参数: $arg"; usage; exit 1 ;;
+  esac
+done
+
+[ "$ran_uninstall" -eq 1 ] || echo "装好了。新开一个会话即可生效。"
