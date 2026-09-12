@@ -19,7 +19,36 @@
 | [🔄 handover](handover/) | 长会话结束前写一份交接文档，新会话读文档就能接着干 | 全平台（Codex / Claude Code / Cursor / OpenCode / Pi / DSH / WorkBuddy / Zcode / Trae / Qoder） |
 | [🩹 minipatch](minipatch/) | 最小改动原则：先报变更计划再动手，只改该改的文件，不重构、不升级依赖 | 全平台（Codex / Claude Code / Cursor / OpenCode / Pi / DSH / WorkBuddy / Zcode / Trae / Qoder） |
 
+## ⚡ 最快：让 AI 自己装
+
+不用 clone 仓库，也不用记每个工具的规则目录在哪。**把下面这段话粘给你在用的任意 AI 编程工具**，它会自己下载、自己放对位置。
+
+```text
+帮我装这几个 skill，内容在下面这些链接里：
+- https://raw.githubusercontent.com/konlue/skills/main/minipatch/SKILL.md
+- https://raw.githubusercontent.com/konlue/skills/main/handover/SKILL.md
+
+每个链接按下面的规则落位，只追加、不要覆盖目标文件里已有的内容：
+- Codex / Cursor / OpenCode / Pi / DSH / Zcode / Qoder → 项目根目录的 AGENTS.md
+- Claude Code → CLAUDE.md，再复制一份到 .claude/commands/<skill 名>.md
+- Trae → .trae/rules/<skill 名>.md
+- WorkBuddy → .workbuddy/skills/<skill 名>/SKILL.md
+
+装完告诉我你改了哪些文件。
+```
+
+只装一个的话，删掉多余链接就行；工具够聪明时一句话也够：
+
+```text
+帮我装这个 skill：https://raw.githubusercontent.com/konlue/skills/main/minipatch/SKILL.md
+```
+
+> 链接规律：`https://raw.githubusercontent.com/konlue/skills/main/<skill 名>/SKILL.md`
+> 访问不稳时，把 `raw.githubusercontent.com/konlue/skills/main/` 换成 `cdn.jsdelivr.net/gh/konlue/skills@main/` 即可。
+
 ## 30 秒上手
+
+想省事就用上一节的方式。这里给的是命令行装法。
 
 ### 🔄 handover
 
