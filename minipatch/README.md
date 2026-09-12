@@ -2,7 +2,7 @@
 
 **改代码前先报计划，只改该改的文件，不重构、不升级依赖。**
 
-一个跨平台的最小改动原则约束，适用于 Codex、Claude Code、DSH、WorkBuddy、Zcode、Trae、Qoder。
+一个跨平台的最小改动原则约束，适用于 Codex、Claude Code、Cursor、OpenCode、Pi、DSH、WorkBuddy、Zcode、Trae、Qoder。
 
 ## 解决什么问题
 
@@ -23,6 +23,9 @@ Minipatch 把这个「最小改动原则」固化成规则，让 AI 在动任何
 |------|--------|----------|
 | **Codex** | `AGENTS.md`（追加） | 当前项目 |
 | **Claude Code** | `CLAUDE.md`（追加）+ `.claude/commands/minipatch.md` | 当前项目 + `/minipatch` 命令 |
+| **Cursor** | `.cursor/rules/minipatch.mdc` | 当前项目（`@minipatch` 可手动引用） |
+| **OpenCode** | `~/.config/opencode/AGENTS.md`（追加） | 全局 |
+| **Pi** | `~/.pi/agent/AGENTS.md`（追加） | 全局 |
 | **DSH** | `~/.dsh/skills/minipatch/SKILL.md` | 全局（项目级用 `.dsh/skills/`） |
 | **WorkBuddy** | `~/.workbuddy/skills/minipatch/SKILL.md` | 全局（项目级用 `.workbuddy/skills/`） |
 | **Zcode** | `~/.zcode/skills/minipatch/SKILL.md` | 全局 |
@@ -35,6 +38,9 @@ Minipatch 把这个「最小改动原则」固化成规则，让 AI 在动任何
 ./install.sh                 # 项目级：追加到 AGENTS.md + 生成 Trae 规则
 ./install.sh --project       # 同上
 ./install.sh --cc            # Claude Code：CLAUDE.md + .claude/commands/minipatch.md
+./install.sh --cursor        # Cursor：.cursor/rules/minipatch.mdc
+./install.sh --opencode      # OpenCode：~/.config/opencode/AGENTS.md
+./install.sh --pi            # Pi：~/.pi/agent/AGENTS.md
 ./install.sh --codex         # Codex：追加到 ~/.codex/AGENTS.md
 ./install.sh --dsh           # DSH：装到 ~/.dsh/skills/
 ./install.sh --workbuddy     # WorkBuddy：装到 ~/.workbuddy/skills/
@@ -57,6 +63,13 @@ cat minipatch/SKILL.md >> AGENTS.md
 cat minipatch/SKILL.md >> CLAUDE.md
 mkdir -p .claude/commands && cp minipatch/SKILL.md .claude/commands/minipatch.md
 
+# Cursor（必须用 .mdc 扩展名，.md 会被忽略）
+mkdir -p .cursor/rules && cp minipatch/SKILL.md .cursor/rules/minipatch.mdc
+
+# OpenCode / Pi
+cat minipatch/SKILL.md >> ~/.config/opencode/AGENTS.md
+cat minipatch/SKILL.md >> ~/.pi/agent/AGENTS.md
+
 # 走 skills 目录的平台
 mkdir -p ~/.workbuddy/skills/minipatch && cp minipatch/SKILL.md ~/.workbuddy/skills/minipatch/
 mkdir -p ~/.dsh/skills/minipatch       && cp minipatch/SKILL.md ~/.dsh/skills/minipatch/
@@ -77,8 +90,9 @@ Trae 用户注意：项目规则默认读取 `AGENTS.md` / `CLAUDE.md` 的开关
 
 ### 手动触发
 
-- **Claude Code / Qoder**：输入 `/minipatch` 
+- **Claude Code / Qoder**：输入 `/minipatch`
 - **Trae**：聊天框输入 `#Rule minipatch`
+- **Cursor**：聊天框输入 `@minipatch`
 - **其他平台**：直接说「按 minipatch 的原则改」
 
 典型用法——高风险改动前加一句：
