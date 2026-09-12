@@ -16,8 +16,8 @@
 
 | Skill | 一句话定位 | 适用平台 |
 |-------|-----------|----------|
-| [🔄 handover](handover/) | 长会话结束前写一份交接文档，新会话读文档就能接着干 | 全平台（Codex / Claude Code / DSH / WorkBuddy / Zcode / Trae / Qoder） |
-| [🩹 minipatch](minipatch/) | 最小改动原则：先报变更计划再动手，只改该改的文件，不重构、不升级依赖 | 全平台（Codex / Claude Code / DSH / WorkBuddy / Zcode / Trae / Qoder） |
+| [🔄 handover](handover/) | 长会话结束前写一份交接文档，新会话读文档就能接着干 | 全平台（Codex / Claude Code / Cursor / OpenCode / Pi / DSH / WorkBuddy / Zcode / Trae / Qoder） |
+| [🩹 minipatch](minipatch/) | 最小改动原则：先报变更计划再动手，只改该改的文件，不重构、不升级依赖 | 全平台（Codex / Claude Code / Cursor / OpenCode / Pi / DSH / WorkBuddy / Zcode / Trae / Qoder） |
 
 ## 30 秒上手
 
@@ -64,6 +64,9 @@ cd minipatch && ./install.sh --trae     # 只装 Trae
 |------|----------------|
 | Codex | `AGENTS.md` |
 | Claude Code | `CLAUDE.md`、`.claude/commands/` |
+| Cursor | `.cursor/rules/*.mdc`（或 `AGENTS.md`） |
+| OpenCode | `AGENTS.md`、`~/.config/opencode/AGENTS.md` |
+| Pi | `AGENTS.md`、`~/.pi/agent/AGENTS.md` |
 | DSH | `AGENTS.md`、`~/.dsh/skills/` |
 | WorkBuddy | `~/.workbuddy/skills/` |
 | Zcode | `AGENTS.md`、`~/.zcode/skills/` |
