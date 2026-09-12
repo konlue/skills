@@ -3,14 +3,33 @@
 # 用法: ./install.sh [--all|--project|--codex|--cc|--cursor|--opencode|--pi|--dsh|--workbuddy|--zcode|--trae|--qoder|--uninstall]
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-SRC="$SCRIPT_DIR/SKILL.md"
+RAW_BASE="https://raw.githubusercontent.com/konlue/skills/main/handover"
 MARK_START="<!-- handover:start -->"
 MARK_END="<!-- handover:end -->"
 
+# 用 curl ... | bash 这种方式运行时没有脚本文件，BASH_SOURCE 不可用，走下载分支
+SCRIPT_DIR=""
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+  SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+
+TMP_SRC=""
+cleanup() { [ -n "$TMP_SRC" ] && [ -f "$TMP_SRC" ] && rm -f "$TMP_SRC"; return 0; }
+trap cleanup EXIT
+
+SRC="$SCRIPT_DIR/SKILL.md"
+
 if [ ! -f "$SRC" ]; then
-  echo "找不到 $SRC，请在 handover 目录下运行本脚本" >&2
-  exit 1
+  if command -v curl >/dev/null 2>&1; then
+    TMP_SRC="$(mktemp 2>/dev/null || echo "${TMPDIR:-.}/handover-SKILL.md.$$")"
+    echo "本地没有 SKILL.md，从 $RAW_BASE 下载..."
+    curl -fsSL "$RAW_BASE/SKILL.md" -o "$TMP_SRC" || {
+      echo "下载失败，检查网络或改用本地运行：./install.sh" >&2; exit 1; }
+    SRC="$TMP_SRC"
+  else
+    echo "找不到 SKILL.md，请在 handover 目录下运行本脚本，或安装 curl" >&2
+    exit 1
+  fi
 fi
 
 usage() {
