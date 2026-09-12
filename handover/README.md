@@ -27,7 +27,33 @@ AI 编程会话有上下文上限。会话断了之后，新对话什么都不�
 | **Trae** | `.trae/rules/handover.md` | 当前项目（需在设置里开启规则读取） |
 | **Qoder** | `~/.qoder/skills/handover/SKILL.md` | 全局（项目级用 `.qoder/skills/`） |
 
-### 方式一：一键脚本
+### 方式一：让 AI 自己装（最省事）
+
+不用记路径，**把这段话直接粘给你在用的任意 AI 编程工具的对话框**：
+
+```text
+帮我装一个 skill。内容在这里：
+https://raw.githubusercontent.com/konlue/skills/main/handover/SKILL.md
+
+按下面的位置安装，只追加、不要覆盖目标文件里已有的内容：
+- Codex / Cursor / OpenCode / Pi / DSH / Zcode / Qoder → 项目根目录的 AGENTS.md
+- Claude Code → CLAUDE.md，再复制一份到 .claude/commands/handover.md
+- Trae → .trae/rules/handover.md
+- WorkBuddy → .workbuddy/skills/handover/SKILL.md
+
+装完告诉我你改了哪些文件。
+```
+
+如果你用的工具能猜对位置，其实一句话就够：
+
+```text
+帮我装这个 skill：https://raw.githubusercontent.com/konlue/skills/main/handover/SKILL.md
+```
+
+> `raw.githubusercontent.com` 访问不稳时，把链接换成 jsDelivr：
+> `https://cdn.jsdelivr.net/gh/konlue/skills@main/handover/SKILL.md`
+
+### 方式二：一键脚本
 
 ```bash
 ./install.sh                 # 项目级：追加到 AGENTS.md + 生成 Trae 规则
@@ -44,11 +70,14 @@ AI 编程会话有上下文上限。会话断了之后，新对话什么都不�
 ./install.sh --qoder         # Qoder：装到 ~/.qoder/skills/
 ./install.sh --all           # 全平台，一次装完
 ./install.sh --uninstall     # 撤掉装过的所有内容
+
+# 不想 clone 整个仓库，也可以直接跑远端脚本
+curl -fsSL https://raw.githubusercontent.com/konlue/skills/main/handover/install.sh | bash -s -- --all
 ```
 
 脚本用 `<!-- handover:start/end -->` 标记包裹追加内容，重复运行不会产生重复副本，`--uninstall` 能干净移除。
 
-### 方式二：手动复制
+### 方式三：手动复制
 
 ```bash
 # 通用（Codex / DSH / Zcode / Qoder 走 AGENTS.md 的平台）
