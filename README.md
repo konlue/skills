@@ -8,6 +8,7 @@
 
 - **会话一断，上下文全丢。** 新会话什么都不记得，你又得把项目背景、已经做了什么、踩过哪些坑重新讲一遍 → [handover](handover/)
 - **让它改一处，它顺手改一片。** 修一个 bug 顺带重构三个文件、格式化整个目录、还把依赖升了一版，diff 从 20 行变 800 行 → [minipatch](minipatch/)
+- **自己审自己，等于没审。** 说一句「检查一下代码」，它回你「整体结构清晰，建议补充测试」，看着挺认真，什么也没查出来 → [coldreview](coldreview/)
 - **同一条规则要配 N 遍。** Codex 读 `AGENTS.md`、Claude Code 读 `CLAUDE.md`、Trae 读 `.trae/rules/`、Qoder 读 skills 目录……同一个诉求得按每个工具的格式各写一份
 
 这个仓库把这些应对方法沉淀成可以直接复制的 Markdown，装一次就不用每次重复交代。
@@ -16,8 +17,9 @@
 
 | Skill | 一句话定位 | 适用平台 |
 |-------|-----------|----------|
-| [🔄 handover](handover/) | 长会话结束前写一份交接文档，新会话读文档就能接着干 | 全平台（Codex / Claude Code / Cursor / OpenCode / Pi / DSH / WorkBuddy / Zcode / Trae / Qoder） |
-| [🩹 minipatch](minipatch/) | 最小改动原则：先报变更计划再动手，只改该改的文件，不重构、不升级依赖 | 全平台（Codex / Claude Code / Cursor / OpenCode / Pi / DSH / WorkBuddy / Zcode / Trae / Qoder） |
+| [🔄 handover](handover/) | 长会话结束前写一份交接文档，新会话读文档就能接着干 | 全平台 |
+| [🩹 minipatch](minipatch/) | 最小改动原则：先报变更计划再动手，只改该改的文件，不重构、不升级依赖 | 全平台 |
+| [🔍 coldreview](coldreview/) | 代码自审：切换成 Reviewer 角色，只查边界条件、异常处理、性能瓶颈、安全风险，出清单不改代码 | 全平台 |
 
 ## ⚡ 最快：让 AI 自己装
 
@@ -27,6 +29,7 @@
 帮我装这几个 skill，内容在下面这些链接里：
 - https://raw.githubusercontent.com/konlue/skills/main/minipatch/SKILL.md
 - https://raw.githubusercontent.com/konlue/skills/main/handover/SKILL.md
+- https://raw.githubusercontent.com/konlue/skills/main/coldreview/SKILL.md
 
 每个链接按下面的规则落位，只追加、不要覆盖目标文件里已有的内容：
 - Codex / Cursor / OpenCode / Pi / DSH / Zcode / Qoder → 项目根目录的 AGENTS.md
@@ -84,6 +87,25 @@ cd minipatch && ./install.sh --trae     # 只装 Trae
 ```
 
 > Claude Code / Qoder 里输入 `/minipatch`；Trae 里用 `#Rule minipatch`；其他平台直接说「按 minipatch 的原则改」。
+
+### 🔍 coldreview
+
+安装：
+
+```bash
+cd coldreview && ./install.sh --all      # 全平台
+```
+
+使用：提交 PR 前加一句。
+
+```text
+现在切换成资深 Reviewer，不要修改代码，只检查这 4 件事：
+边界条件、异常处理、性能瓶颈、安全风险。按严重程度列出问题，并给出最小修改方案。
+```
+
+装成常驻规则后，AI 完成非平凡实现会自己来一轮，不用你开口。
+
+> Claude Code / Qoder 里输入 `/coldreview`；Trae 里用 `#Rule coldreview`；Cursor 里用 `@coldreview`。
 
 ## 适配的平台
 
