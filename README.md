@@ -10,6 +10,7 @@
 - **让它改一处，它顺手改一片。** 修一个 bug 顺带重构三个文件、格式化整个目录、还把依赖升了一版，diff 从 20 行变 800 行 → [minipatch](minipatch/)
 - **自己审自己，等于没审。** 说一句「检查一下代码」，它回你「整体结构清晰，建议补充测试」，看着挺认真，什么也没查出来 → [coldreview](coldreview/)
 - **你说什么都对，它就照着做。** 前提错了它也顺着跑，执行得越漂亮返工越大 → [pushback](pushback/)
+- **「继续优化」是个死循环。** 它每一轮都能拿出「新的改进」，但收益越来越小、改动越来越大，最后给你一个改了 20 处、快了 2% 的 PR → [stoprule](stoprule/)
 - **同一条规则要配 N 遍。** Codex 读 `AGENTS.md`、Claude Code 读 `CLAUDE.md`、Trae 读 `.trae/rules/`、Qoder 读 skills 目录……同一个诉求得按每个工具的格式各写一份
 
 这个仓库把这些应对方法沉淀成可以直接复制的 Markdown，装一次就不用每次重复交代。
@@ -22,8 +23,9 @@
 | [🩹 minipatch](minipatch/) | 最小改动原则：先报变更计划再动手，只改该改的文件，不重构、不升级依赖 | 全平台 |
 | [🔍 coldreview](coldreview/) | 代码自审：切换成 Reviewer 角色，只查边界条件、异常处理、性能瓶颈、安全风险，出清单不改代码 | 全平台 |
 | [🙅 pushback](pushback/) | 别做应声虫：执行前检查错误前提与逻辑漏洞，不迎合、独立判断，发现问题当场指出 | 全平台 |
+| [🛑 stoprule](stoprule/) | 优化停止条件：先建基线、定目标与测量方法，收益超过成本阈值才实施，否则停止并记录取舍 | 全平台 |
 
-四个覆盖一次任务的完整链路：**接到指令**（pushback：前提是错的就别照做）→ **动手改之前**（minipatch：先报计划）→ **改完之后**（coldreview：换角色审）→ **会话要断时**（handover：写交接文档）。可以都装，互不冲突。
+五个覆盖一次任务的完整链路：**接到指令**（pushback：前提是错的就别照做）→ **动手改之前**（minipatch：先报计划）→ **优化类任务**（stoprule：够好就停）→ **改完之后**（coldreview：换角色审）→ **会话要断时**（handover：写交接文档）。可以都装，互不冲突。
 
 ## ⚡ 最快：让 AI 自己装
 
@@ -35,6 +37,7 @@
 - https://raw.githubusercontent.com/konlue/skills/main/handover/SKILL.md
 - https://raw.githubusercontent.com/konlue/skills/main/coldreview/SKILL.md
 - https://raw.githubusercontent.com/konlue/skills/main/pushback/SKILL.md
+- https://raw.githubusercontent.com/konlue/skills/main/stoprule/SKILL.md
 
 每个链接按下面的规则落位，只追加、不要覆盖目标文件里已有的内容：
 - Codex / Cursor / OpenCode / Pi / DSH / Zcode / Qoder → 项目根目录的 AGENTS.md
@@ -130,6 +133,23 @@ cd pushback && ./install.sh --all      # 全平台
 说明风险主动提醒；
 容易忽略的变量与偏差。
 ```
+
+### 🛑 stoprule
+
+安装：
+
+```bash
+cd stoprule && ./install.sh --all      # 全平台
+```
+
+使用：提优化需求时把这句带上，AI 会先建基线再动手。
+
+```text
+先定义当前基线、目标指标和测量方法；
+只有收益超过成本阈值才实施，否则停止优化，并记录取舍。
+```
+
+> Claude Code / Qoder 里输入 `/stoprule`；Trae 里用 `#Rule stoprule`；Cursor 里用 `@stoprule`。
 
 ## 适配的平台
 
